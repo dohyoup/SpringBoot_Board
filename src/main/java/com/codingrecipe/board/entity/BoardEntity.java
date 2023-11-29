@@ -13,7 +13,7 @@ import javax.persistence.*;
 @Table(name = "board_table")
 public class BoardEntity extends BaseEntity {
     @Id // pk 컬럼 지정. 필수로 하나는 있어야함
-    @GeneratedValue(strategy = GenerationType.IDENTITY) //auto_increment
+    @GeneratedValue(strategy = GenerationType.IDENTITY) //auto_increment => 아이디 값 자동증가
     private Long id;
 
     @Column(length = 20, nullable = false)
