@@ -14,7 +14,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/board")
 public class BoardController {
-    private final BoardSevice boardSevice;
+    private final BoardSevice boardService;
 
 
     @GetMapping("/save")
@@ -24,14 +24,14 @@ public class BoardController {
 
     @PostMapping("/save")
     public String save(@ModelAttribute BoardDTO boardDTO) {
-        boardSevice.save(boardDTO);
+        boardService.save(boardDTO);
         return "index";
     }
 
     @GetMapping("/")
     public String findAll(Model model) {
         //DB에서 전체 게시글 데이터를 가져와서 list.html에 보여준다.
-        List<BoardDTO> boardDTOList = boardSevice.findAll();
+        List<BoardDTO> boardDTOList = boardService.findAll();
         model.addAttribute("boardList", boardDTOList);
         return "list";
     }
@@ -42,10 +42,25 @@ public class BoardController {
             해당 게시글의 조회수를 하나 올리고
             게시글 데이터를 가져와서 detail.html에 출력
          */
-        boardSevice.updateHits(id);
-        BoardDTO boardDTO = boardSevice.findById(id);
+        boardService.updateHits(id);
+        BoardDTO boardDTO = boardService.findById(id);
         System.out.println("값 확인 : " + boardDTO);
         model.addAttribute("board", boardDTO);
         return "detail";
+    }
+
+    @GetMapping("/update/{id}")
+    public String updateForm(@PathVariable Long id, Model model) {
+        BoardDTO boardDTO = boardService.findById(id);
+        model.addAttribute("boardUpdate", boardDTO);
+        return "update";
+    }
+
+    @PostMapping("/update")
+    public String update(@ModelAttribute BoardDTO boardDTO, Model model) {
+        BoardDTO board = boardService.update(boardDTO);
+        model.addAttribute("board", board);
+        return "detail";
+//      return "redirect:/board/" + boardDTO.getId();
     }
 }
