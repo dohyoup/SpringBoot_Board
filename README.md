@@ -15,7 +15,9 @@
     - 서버에서 해당 게시글의 정보를 가지고 수정 화면 출력 
     - 제목, 내용 수정 입력 받아서 서버로 요청 
     - 수정 처리
-<br>      
+5. 글삭제(/board/delete/{id})
+6. 페이징처리(/board/paging)
+    - /board/paging?page=2
 ...      
 
 # DB
