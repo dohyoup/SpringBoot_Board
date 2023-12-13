@@ -2,6 +2,8 @@ package com.codingrecipe.board.service;
 
 import com.codingrecipe.board.dto.BoardDTO;
 import com.codingrecipe.board.entity.BoardEntity;
+import com.codingrecipe.board.entity.BoardFileEntity;
+import com.codingrecipe.board.repository.BoardFileRepository;
 import com.codingrecipe.board.repository.BoardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,7 +27,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class BoardSevice {
     private final BoardRepository boardRepository;
-
+    private final BoardFileRepository boardFileRepository;
     public void save(BoardDTO boardDTO) throws IOException {
         if(boardDTO.getBoardFile().isEmpty()) {
             //첨부파일이 없는 경우
@@ -49,6 +51,13 @@ public class BoardSevice {
             String storedFileName = System.currentTimeMillis() + "_" + originalFilename; //3
             String savePath = "C:/springboot_img/" + storedFileName; // 4
             boardFile.transferTo(new File(savePath)); // 5
+
+            BoardEntity boardEntity = BoardEntity.toSaveFileEntity(boardDTO); // 6
+            Long saveId = boardRepository.save(boardEntity).getId(); // 6
+
+            BoardEntity board = boardRepository.findById(saveId).get(); // 7
+            BoardFileEntity boardFileEntity = BoardFileEntity.toBoardFileEntity(board, originalFilename, storedFileName);// 7
+            boardFileRepository.save(boardFileEntity); // 7
         }
     }
 

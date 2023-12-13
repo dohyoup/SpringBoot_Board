@@ -1,5 +1,6 @@
 package com.codingrecipe.board.entity;
 
+import com.codingrecipe.board.dto.BoardDTO;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -23,4 +24,12 @@ public class BoardFileEntity extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "board_id")
     private BoardEntity boardEntity;
+
+    public static BoardFileEntity toBoardFileEntity(BoardEntity boardEntity, String originalFIleName, String storedFileName) {
+        BoardFileEntity boardFileEntity = new BoardFileEntity();
+        boardFileEntity.setOriginalFIleName(originalFIleName);
+        boardFileEntity.setStoredFileName(storedFileName);
+        boardFileEntity.setBoardEntity(boardEntity);
+        return boardFileEntity;
+    }
 }
