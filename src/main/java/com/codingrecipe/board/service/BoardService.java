@@ -25,7 +25,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
-public class BoardSevice {
+public class BoardService {
     private final BoardRepository boardRepository;
     private final BoardFileRepository boardFileRepository;
     public void save(BoardDTO boardDTO) throws IOException {
@@ -46,21 +46,22 @@ public class BoardSevice {
                 6. board_table에 해당 데이터 save 처리
                 7. board_file_table에 해당 데이터 save 처리
              */
-            MultipartFile boardFile = boardDTO.getBoardFile(); // 1
-            String originalFilename = boardFile.getOriginalFilename(); // 2
-            String storedFileName = System.currentTimeMillis() + "_" + originalFilename; //3
-            String savePath = "C:/springboot_img/" + storedFileName; // 4
-            boardFile.transferTo(new File(savePath)); // 5
-
             BoardEntity boardEntity = BoardEntity.toSaveFileEntity(boardDTO); // 6
             Long saveId = boardRepository.save(boardEntity).getId(); // 6
+            BoardEntity board = boardRepository.findById(saveId).get(); // 6
+            for(MultipartFile boardFile: boardDTO.getBoardFile()) {
+ //               MultipartFile boardFile = boardDTO.getBoardFile(); // 1
+                String originalFilename = boardFile.getOriginalFilename(); // 2
+                String storedFileName = System.currentTimeMillis() + "_" + originalFilename; //3
+                String savePath = "C:/springboot_img/" + storedFileName; // 4
+                boardFile.transferTo(new File(savePath)); // 5
 
-            BoardEntity board = boardRepository.findById(saveId).get(); // 7
-            BoardFileEntity boardFileEntity = BoardFileEntity.toBoardFileEntity(board, originalFilename, storedFileName);// 7
-            boardFileRepository.save(boardFileEntity); // 7
+                BoardFileEntity boardFileEntity = BoardFileEntity.toBoardFileEntity(board, originalFilename, storedFileName);// 7
+                boardFileRepository.save(boardFileEntity); // 7
+            }
         }
     }
-
+    @Transactional
     public List<BoardDTO> findAll() {
         List<BoardEntity> boardEntityList = boardRepository.findAll();
         List<BoardDTO> boardDTOList = new ArrayList<>();
@@ -73,7 +74,7 @@ public class BoardSevice {
     public void updateHits(Long id) {
         boardRepository.updateHits(id);
     }
-
+    @Transactional
     public BoardDTO findById(Long id) {
         Optional<BoardEntity> optionalBoardEntity = boardRepository.findById(id);
         if(optionalBoardEntity.isPresent()) {
@@ -84,12 +85,30 @@ public class BoardSevice {
             return null;
         }
     }
+     @Transactional
+     public BoardDTO update(BoardDTO boardDTO) throws IOException {
+         BoardEntity boardEntity;
+         if(boardDTO.getBoardFile().isEmpty()) {
+            boardEntity = BoardEntity.toUpdateEntity(boardDTO);
+            boardRepository.save(boardEntity);
+            return findById(boardDTO.getId());
+         } else {
+             boardEntity = BoardEntity.toUpdateFileEntity(boardDTO);
+             Long saveId = boardRepository.save(boardEntity).getId();
+             BoardEntity board = boardRepository.findById(saveId).get();
 
-     public BoardDTO update(BoardDTO boardDTO) {
-        BoardEntity boardEntity = BoardEntity.toUpdateEntity(boardDTO);
-        boardRepository.save(boardEntity);
-        return findById(boardDTO.getId());
-    }
+             for(MultipartFile boardFile: boardDTO.getBoardFile()) {
+                String originalFilename = boardFile.getOriginalFilename(); // 2
+                String storedFileName = System.currentTimeMillis() + "_" + originalFilename; //3
+                String savePath = "C:/springboot_img/" + storedFileName; // 4
+                boardFile.transferTo(new File(savePath)); // 5
+
+                BoardFileEntity boardFileEntity = BoardFileEntity.toBoardFileEntity(board, originalFilename, storedFileName);// 7
+                boardFileRepository.save(boardFileEntity); // 7
+            }
+            return findById(boardDTO.getId());
+         }
+     }
 
     public void delete(Long id) {
         boardRepository.deleteById(id);

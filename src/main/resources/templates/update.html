@@ -12,6 +12,10 @@
   title: <input type="text" name="boardTitle" th:value="${boardUpdate.boardTitle}"> <br>
   contents: <textarea name="boardContents" cols="30" rows="10" th:text="${boardUpdate.boardContents}"></textarea> <br>
   <input type="hidden" name="boardHits" th:value="${boardUpdate.boardHits}">
+  <input type="hidden" name="originalFileName" th:value="${boardUpdate.originalFileName}">
+  <input type="hidden" name="storedFileName" th:value="${boardUpdate.storedFileName}">
+  <input type="file" name="boardFile" multiple> <br>
+
   <input type="button" value="글수정" onclick="boardUpdate()">
 </form>
 <script th:inline="javascript">
