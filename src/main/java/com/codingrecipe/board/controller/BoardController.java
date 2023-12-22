@@ -3,6 +3,7 @@ package com.codingrecipe.board.controller;
 import com.codingrecipe.board.dto.BoardDTO;
 import com.codingrecipe.board.service.BoardService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.core.env.PropertySource;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -62,6 +63,7 @@ public class BoardController {
 
     @PostMapping("/update")
     public String update(@ModelAttribute BoardDTO boardDTO, Model model) throws IOException {
+        System.out.println("boardDTO 확인 : " + boardDTO);
         BoardDTO board = boardService.update(boardDTO);
         model.addAttribute("board", board);
         return "detail";

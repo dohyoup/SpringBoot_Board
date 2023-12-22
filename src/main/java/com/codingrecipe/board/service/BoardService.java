@@ -88,15 +88,18 @@ public class BoardService {
      @Transactional
      public BoardDTO update(BoardDTO boardDTO) throws IOException {
          BoardEntity boardEntity;
+         System.out.println("수정 입력값 확인1 :" + boardDTO);
          if(boardDTO.getBoardFile().isEmpty()) {
-            boardEntity = BoardEntity.toUpdateEntity(boardDTO);
-            boardRepository.save(boardEntity);
+             boardEntity = BoardEntity.toUpdateEntity(boardDTO);
+             System.out.println("boardEntity 객체 확인1 = " + boardEntity);
+             boardRepository.save(boardEntity);
             return findById(boardDTO.getId());
          } else {
              boardEntity = BoardEntity.toUpdateFileEntity(boardDTO);
+             System.out.println("boardEntity 객체 확인2 = " + boardEntity);
              Long saveId = boardRepository.save(boardEntity).getId();
              BoardEntity board = boardRepository.findById(saveId).get();
-
+             System.out.println("board 값 확인 :" + board);
              for(MultipartFile boardFile: boardDTO.getBoardFile()) {
                 String originalFilename = boardFile.getOriginalFilename(); // 2
                 String storedFileName = System.currentTimeMillis() + "_" + originalFilename; //3
@@ -104,6 +107,7 @@ public class BoardService {
                 boardFile.transferTo(new File(savePath)); // 5
 
                 BoardFileEntity boardFileEntity = BoardFileEntity.toBoardFileEntity(board, originalFilename, storedFileName);// 7
+                System.out.println("boardFileEntity 확인 = " + boardFileEntity);
                 boardFileRepository.save(boardFileEntity); // 7
             }
             return findById(boardDTO.getId());
