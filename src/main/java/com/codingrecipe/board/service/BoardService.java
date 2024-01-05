@@ -5,6 +5,7 @@ import com.codingrecipe.board.entity.BoardEntity;
 import com.codingrecipe.board.entity.BoardFileEntity;
 import com.codingrecipe.board.repository.BoardFileRepository;
 import com.codingrecipe.board.repository.BoardRepository;
+import com.sun.xml.bind.v2.TODO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -95,11 +96,17 @@ public class BoardService {
              boardRepository.save(boardEntity);
             return findById(boardDTO.getId());
          } else {
+             // update 데이타 저장
              boardEntity = BoardEntity.toUpdateFileEntity(boardDTO);
-             System.out.println("boardEntity 객체 확인2 = " + boardEntity);
+             System.out.println("boardEntity 객체 확인2 = " + boardEntity.toString());
              Long saveId = boardRepository.save(boardEntity).getId();
              BoardEntity board = boardRepository.findById(saveId).get();
-             System.out.println("board 값 확인 :" + board);
+             System.out.println("board 값 확인 :" + board.toString());
+             /*
+             //TODO : 기존 파일 삭제 로직 추가
+             deleteFile(saveId);
+             */
+             // 받아온 파일 정보 board_file_table에 저장
              for(MultipartFile boardFile: boardDTO.getBoardFile()) {
                 String originalFilename = boardFile.getOriginalFilename(); // 2
                 String storedFileName = System.currentTimeMillis() + "_" + originalFilename; //3
@@ -107,7 +114,7 @@ public class BoardService {
                 boardFile.transferTo(new File(savePath)); // 5
 
                 BoardFileEntity boardFileEntity = BoardFileEntity.toBoardFileEntity(board, originalFilename, storedFileName);// 7
-                System.out.println("boardFileEntity 확인 = " + boardFileEntity);
+                System.out.println("boardFileEntity 확인 = " + boardFileEntity.toString());
                 boardFileRepository.save(boardFileEntity); // 7
             }
             return findById(boardDTO.getId());
@@ -116,6 +123,10 @@ public class BoardService {
 
     public void delete(Long id) {
         boardRepository.deleteById(id);
+    }
+
+    public void deleteFile(Long id) {
+        boardFileRepository.deleteById(id);
     }
 
     public Page<BoardDTO> paging(Pageable pageable) {

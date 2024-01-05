@@ -57,6 +57,7 @@ public class BoardController {
     @GetMapping("/update/{id}")
     public String updateForm(@PathVariable Long id, Model model) {
         BoardDTO boardDTO = boardService.findById(id);
+        System.out.println("update boardDTO 값 확인 :" + boardDTO);
         model.addAttribute("boardUpdate", boardDTO);
         return "update";
     }
